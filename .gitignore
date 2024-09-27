@@ -30,5 +30,5 @@ exclude
 /tmp
 /cache_data
 
-.env
 .DS_Store
+assets/

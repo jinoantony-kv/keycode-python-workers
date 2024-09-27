@@ -2,7 +2,8 @@ import pika
 import threading
 from dotenv import load_dotenv
 
-load_dotenv(verbose=True, override=True)
+# Load environment variables from the .env file
+load_dotenv()
 
 from src.workers.video_mixer_worker import worker1_cb
 
