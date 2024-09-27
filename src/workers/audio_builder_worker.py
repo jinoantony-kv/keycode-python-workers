@@ -37,9 +37,11 @@ s3 = boto3.client(
 
 
 def text_to_audio_worker(ch, method, properties, body):
-    print("Received message in text_to_audio_worker")
-    print(f"Message body: {body}")
+    print(
+        "------------------------------ Received message in text_to_audio_worker -----------------------------------------------"
+    )
     data = json.loads(body)
+    print(f"text_to_audio_worker: Handling: {data}")
     story_id = data["story_id"]
     texts = data["narrations"]
 
@@ -66,6 +68,8 @@ def text_to_audio_worker(ch, method, properties, body):
     )
     
     publish_message(VIDEO_MIXER_QUEUE, json.dumps({"story_id": story_id}))
+    
+    print("--------------------- Published message to video mixer queue ---------------------")
 
 
 def text_to_speech_stream(text: str) -> BytesIO:

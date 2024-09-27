@@ -12,7 +12,6 @@ from src.utils.s3 import download_media_from_s3, upload_to_s3
 def video_mixer_worker_cb(ch, method, properties, body):
     print("Worker called successfully")
     data = json.loads(body)
-    print("Recieved data from Queue", data)
     story_id = data["story_id"]
 
     story = perform_query("SELECT * FROM stories WHERE id = %s", (story_id,))
