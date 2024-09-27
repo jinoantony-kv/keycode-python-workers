@@ -48,11 +48,11 @@ class ScriptGeneration():
         self.setup_prompt_template()     
 
 
-    def generate_script(self,user_input):
+    def generate_script(self,moral,character):
         """
         Used to generate the script
         """
-        input_data = {"user_input": user_input}
+        input_data = {"moral_value":moral,"main_character":character,"number":1}
         input_data.update(self.story_hints)  
         
         try:
