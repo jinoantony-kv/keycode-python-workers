@@ -258,8 +258,12 @@ Your task is to generate a story for children aged 3-8 based on the user inputs.
 
 6. **Scene Description Instructions:**
    - **Style:** Bright, colorful, and whimsical.
-   - **Detail:** Focus on vibrant visuals that appeal to young children.
-   - **Setting:** Generate the setting according to the user's input or use a relatable environment for kids (e.g., a playground, a friendly forest, a sunny beach).
+   - **Brevity and Clarity:** Keep the description concise and to the point, with a maximum of 50 words per scene. Focus on key details that are essential to set the mood and visualize the environment clearly.
+   - **Detail:** Include only the most important visual elements (e.g., character appearance, clothing, facial expressions, and key environmental features such as weather or surroundings). Ensure the descriptions remain vivid while using minimal words.
+   - **Interaction:** Show how characters interact with their surroundings (e.g., smiling at a bird flying into the sky, standing by a blooming garden).
+   - **Setting:** Generate the setting that enhances the mood, but keep the description simple and focused (e.g., cozy home, bright playground).
+   - **Mood and Tone:** Evoke a positive and lively atmosphere with minimal but impactful descriptions.
+   - **Description Style:** Give characteristics of the characters along with it in brackets (e.g., character(character description))
 
 7. **Scenes:**
    - The story should have a minimum of 6 scenes and a maximum of 10 scenes.
@@ -281,7 +285,9 @@ Your task is to generate a story for children aged 3-8 based on the user inputs.
    _"Narration text here."_
 
 2.**Scene Description:**
-   _"Scene description here."_
+   _"Scene description here(max 50 words)."_
+
+- Include only essential visual elements like character outfits, colors, emotions, and environmental interactions (e.g., clear blue sky, blooming flowers). Describe facial expressions, body language, and how the characters interact with their surroundings in a concise manner._   
 
 ### **Example Inputs:**
 
@@ -306,7 +312,7 @@ prompt_template_new = PromptTemplate(
 
 # Default inputs (these can be replaced with user inputs)
 DEFAULT_PROMPT_INPUT_NEW = {
-    "main_character": "A cat named tikku ",
+    "main_character": "A Kitten named Simba",
     "moral_value": "The importance of sharing",
     "number": 1  # Starting scene number
 }
