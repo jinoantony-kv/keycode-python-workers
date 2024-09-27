@@ -1,7 +1,7 @@
 import pika
 import threading
 
-from worker1 import worker1_cb
+from src.workers.worker1 import worker1_cb
 
 # RabbitMQ connection settings for CloudAMQP
 CLOUDAMQP_URL = "amqps://buaalina:6OTVB39Ou0xkMadPjkPNjsukl94w06Tg@armadillo.rmq.cloudamqp.com/buaalina"

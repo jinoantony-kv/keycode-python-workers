@@ -13,4 +13,4 @@
     ```pip install -r requirements.txt```
 4. Run workers
 
-    ```python3 worker_register.py```
+    ```python3 src/worker_register.py```
