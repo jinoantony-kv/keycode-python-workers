@@ -1,5 +1,9 @@
 # Repo for Python workers
 
+## How to run streamlit
+
+    '''streamlit run app-name.py'''
+
 ## How to run workers
 
 1. Create a virtual env
