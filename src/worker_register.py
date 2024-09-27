@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 # Load environment variables from the .env file
 load_dotenv(override=True)
 
-from src.workers.video_mixer_worker import worker1_cb
+from src.workers.video_mixer_worker import video_mixer_worker_cb
 from src.workers.audio_builder_worker import text_to_audio_worker
 
 # RabbitMQ connection settings for CloudAMQP
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     worker_register = WorkerRegister(CLOUDAMQP_URL)
 
     # Register workers for different queues with their respective callbacks
-    worker_register.register("test_queue_0", worker1_cb)
+    worker_register.register("test_queue_0", video_mixer_worker_cb)
     worker_register.register("audio-queue", text_to_audio_worker)
 
     # Wait for all threads (workers) to complete

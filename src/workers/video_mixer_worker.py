@@ -9,15 +9,15 @@ from src.utils.db import perform_query
 from src.utils.s3 import download_media_from_s3, upload_to_s3
 
 
-def worker1_cb(ch, method, properties, body):
+def video_mixer_worker_cb(ch, method, properties, body):
     print("Worker called successfully")
-    # print(ch, method, properties, body)
     data = json.loads(body)
-    print(data)
+    print("Recieved data from Queue", data)
     story_id = data["story_id"]
 
     story = perform_query("SELECT * FROM stories WHERE id = %s", (story_id,))
     if len(story) == 0:
+        print(f"No stories found for the given id: {story_id}")
         return
 
     story = story[0]
@@ -26,10 +26,12 @@ def worker1_cb(ch, method, properties, body):
         print("Either audio or video is not complete")
         return
 
+    print("=============Starting video and audio mixing=============")
     video_url = combine_videos_and_audios(
         story["video_assets"], story["audio_assets"]
     )
 
+    print("=============Mixing completed, final video generated =============")
     perform_query(
         "UPDATE stories SET master_video_url = %s WHERE id = %s",
         (video_url, story_id),
@@ -74,6 +76,8 @@ def combine_videos_and_audios(video_list, audio_list):
             temp_combined_video = tempfile.NamedTemporaryFile(
                 suffix=".mp4", delete=False
             )
+
+            print("Writing mixed video to disk")
             combined_video.write_videofile(
                 temp_combined_video.name, codec="libx264", audio_codec="aac"
             )
@@ -86,6 +90,8 @@ def combine_videos_and_audios(video_list, audio_list):
 
         # Save the final output locally
         output_path = "final_output_video.mp4"
+
+        print("Writing final joined video to disk")
         final_video.write_videofile(
             output_path, codec="libx264", audio_codec="aac"
         )
@@ -109,10 +115,3 @@ def combine_videos_and_audios(video_list, audio_list):
                 os.remove(temp_file)
             except Exception as e:
                 print(f"Error removing temporary file {temp_file}: {e}")
-
-        # # Remove the local output file if it exists
-        # if os.path.exists(output_path):
-        #     try:
-        #         os.remove(output_path)
-        #     except Exception as e:
-        #         print(f"Error removing output file {output_path}: {e}")
