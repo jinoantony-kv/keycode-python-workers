@@ -1,7 +1,6 @@
 import re
 from langchain.chains import LLMChain
 from langchain_core.prompts import PromptTemplate
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 
 from src.script_generation.prompt import DEFAULT_PROMPT_NEW, DEFAULT_PROMPT_INPUT_NEW
@@ -9,7 +8,7 @@ from src.config import OPENAI_API_KEY
 
 
 class ScriptGeneration():
-    def __init__(self,system_prompt  = DEFAULT_PROMPT_NEW,story_hints : dict = DEFAULT_PROMPT_INPUT_NEW,client_id = None):
+    def __init__(self,system_prompt  = DEFAULT_PROMPT_NEW,story_hints : dict = DEFAULT_PROMPT_INPUT_NEW):
         # self.llm = ChatGoogleGenerativeAI(
         #     model="gemini-1.5-flash",
         #     convert_system_message_to_human=False,

@@ -8,15 +8,18 @@ from elevenlabs import VoiceSettings
 from elevenlabs import ElevenLabs
 
 from src.utils.db import perform_query
+from src.utils.amqp import publish_message
 
 # Load environment variables
-load_dotenv()
+load_dotenv(override=True)
 
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_REGION = os.getenv("AWS_REGION")
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
+
+VIDEO_MIXER_QUEUE = "test_queue_0"
 
 from botocore.config import Config
 my_config = Config(
@@ -34,9 +37,11 @@ s3 = boto3.client(
 
 
 def text_to_audio_worker(ch, method, properties, body):
+    print("Received message in text_to_audio_worker")
+    print(f"Message body: {body}")
     data = json.loads(body)
     story_id = data["story_id"]
-    texts = data["texts"]
+    texts = data["narrations"]
 
     audio_urls = []
 
@@ -54,10 +59,13 @@ def text_to_audio_worker(ch, method, properties, body):
 
         audio_urls.append(presigned_url)
 
+    print(f"Audio URLs: {audio_urls}")
     perform_query(
         "UPDATE stories SET audio_assets = %s WHERE id = %s",
         (json.dumps(audio_urls), story_id),
     )
+    
+    publish_message(VIDEO_MIXER_QUEUE, json.dumps({"story_id": story_id}))
 
 
 def text_to_speech_stream(text: str) -> BytesIO:

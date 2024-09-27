@@ -5,7 +5,7 @@ from botocore.exceptions import NoCredentialsError
 from dotenv import load_dotenv
 
 # Load environment variables from the .env file
-load_dotenv()
+load_dotenv(override=True)
 
 
 # Access the AWS credentials from environment variables

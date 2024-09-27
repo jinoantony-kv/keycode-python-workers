@@ -1,4 +1,8 @@
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from the .env file
+load_dotenv(override=True)
 
 
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")

@@ -5,8 +5,8 @@ from uuid import uuid4
 
 from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
 
-from utils.db import perform_query
-from utils.s3 import download_media_from_s3, upload_to_s3
+from src.utils.db import perform_query
+from src.utils.s3 import download_media_from_s3, upload_to_s3
 
 
 def worker1_cb(ch, method, properties, body):

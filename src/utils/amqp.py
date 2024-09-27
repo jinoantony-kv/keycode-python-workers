@@ -25,7 +25,7 @@ def publish_message(queue_name, message):
         )
     )
 
-    print(f" [x] Sent message to queue '{queue_name}': {message}")
+    print(f" [x] Sent message to rabbitmq: {CLOUDAMQP_URL}, queue '{queue_name}': {message}")                                 
 
     # Close the connection
     connection.close()
