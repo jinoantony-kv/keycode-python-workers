@@ -1,10 +1,13 @@
 import os
 import uuid
+import json
 from io import BytesIO
 import boto3
 from dotenv import load_dotenv
 from elevenlabs import VoiceSettings
 from elevenlabs import ElevenLabs
+
+from src.utils.db import perform_query
 
 # Load environment variables
 load_dotenv()
@@ -12,19 +15,49 @@ load_dotenv()
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_REGION_NAME = os.getenv("AWS_REGION_NAME")
+AWS_REGION = os.getenv("AWS_REGION")
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
+
+from botocore.config import Config
+my_config = Config(
+    signature_version="v4",
+)
 
 # Set up ElevenLabs client
 client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
 
 # Set up AWS S3 client
-session = boto3.Session(
-    aws_access_key_id=AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-    region_name=AWS_REGION_NAME,
+
+s3 = boto3.client(
+    "s3", aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY, region_name=AWS_REGION, config=my_config
 )
-s3 = session.client("s3")
+
+
+def text_to_audio_worker(ch, method, properties, body):
+    data = json.loads(body)
+    story_id = data["story_id"]
+    texts = data["texts"]
+
+    audio_urls = []
+
+    for text in texts:
+        # Convert text to speech
+        audio_stream = text_to_speech_stream(text)
+
+        # Upload to S3
+        s3_file_name = upload_audio_to_s3(audio_stream)
+
+        # Generate presigned URL
+        presigned_url = generate_presigned_url(s3_file_name)
+
+        print(f"Presigned URL to access the audio: {presigned_url}")
+
+        audio_urls.append(presigned_url)
+
+    perform_query(
+        "UPDATE stories SET audio_assets = %s WHERE id = %s",
+        (json.dumps(audio_urls), story_id),
+    )
 
 
 def text_to_speech_stream(text: str) -> BytesIO:
@@ -71,16 +104,17 @@ def generate_presigned_url(s3_file_name: str) -> str:
 # Uncomment to test
 
 # if __name__ == "__main__":
-#     # Example usage
-#     text = "Once upon a time, a little dog named Max lived in a cozy house on the edge of a small town. Max was a playful puppy with soft, brown fur and a wagging tail that never stopped. Every morning, he would wait by the door, eager for his daily adventure in the nearby woods."
-    
-#     # Convert text to speech
-#     audio_stream = text_to_speech_stream(text)
-    
-#     # Upload to S3
-#     s3_file_name = upload_audio_to_s3(audio_stream)
-    
-#     # Generate presigned URL
-#     presigned_url = generate_presigned_url(s3_file_name)
-    
-#     print(f"Presigned URL to access the audio: {presigned_url}")
+    # Example usage
+    # text = "Once upon a time, a little dog named Max lived in a cozy house on the edge of a small town. Max was a playful puppy with soft, brown fur and a wagging tail that never stopped. Every morning, he would wait by the door, eager for his daily adventure in the nearby woods."
+    # text_2 = "One day, while exploring the woods, Max stumbled upon a hidden path that led to a mysterious cave. Curious and excited, he wagged his tail and barked with joy as he ventured deeper into the darkness. The cave was damp and cold, with strange markings on the walls that glowed in the dim light."
+    # text_to_audio_worker(None, None, None, json.dumps({"story_id": 1, "texts": [text, text_2]}))
+    # # Convert text to speech
+    # audio_stream = text_to_speech_stream(text)
+
+    # # Upload to S3
+    # s3_file_name = upload_audio_to_s3(audio_stream)
+
+    # # Generate presigned URL
+    # presigned_url = generate_presigned_url(s3_file_name)
+
+    # print(f"Presigned URL to access the audio: {presigned_url}")
