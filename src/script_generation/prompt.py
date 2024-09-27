@@ -232,7 +232,7 @@ Your task is to generate a story for children aged 3-8 based on the user inputs.
 
 1. **Main Character Emphasis:**
    - Ensure that the main character, "{main_character}", is the protagonist and remains central throughout the story.
-   - Do not introduce other characters that overshadow the main character.
+   - Do not introduce other characters that overshadow the main character, there should be no more than 2 characters.
 
 2. **Moral Value Integration:**
    - The story must strongly emphasize the moral value: "{moral_value}".
@@ -285,7 +285,7 @@ Your task is to generate a story for children aged 3-8 based on the user inputs.
    _"Narration text here."_
 
 2.**Scene Description:**
-   _"Scene description here(max 50 words)."_
+   _"Scene description here(only one sentence and max 10 words)."_
 
 - Include only essential visual elements like character outfits, colors, emotions, and environmental interactions (e.g., clear blue sky, blooming flowers). Describe facial expressions, body language, and how the characters interact with their surroundings in a concise manner._   
 
@@ -296,7 +296,7 @@ Your task is to generate a story for children aged 3-8 based on the user inputs.
 
 """
 
-DEFAULT_PROMPT_INPUT_NEW = {
+DEFAULT_PROMPT_INPUT_NEW_1 = {
 "Narration Tone": "Cheerful and playful.",
 "Narration Style": "Simple, clear, and engaging for young children.",
 "Narration Pacing": "Steady and easy to follow, keeping children interested.",
@@ -312,7 +312,7 @@ prompt_template_new = PromptTemplate(
 
 # Default inputs (these can be replaced with user inputs)
 DEFAULT_PROMPT_INPUT_NEW = {
-    "main_character": "A Kitten named Simba",
+    "main_character": "A Kitten named Mitu",
     "moral_value": "The importance of sharing",
     "number": 1  # Starting scene number
 }
