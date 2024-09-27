@@ -1,2 +1,5 @@
 moviepy
 pika
+python-dotenv
+psycopg2
+requests
