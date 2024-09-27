@@ -2,8 +2,8 @@ import json
 
 from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
 
-from util.db import perform_query
-from util.s3 import fetch_media_from_s3, upload_to_s3
+from utils.db import perform_query
+from utils.s3 import fetch_media_from_s3, upload_to_s3
 
 
 def worker1_cb(ch, method, properties, body):
