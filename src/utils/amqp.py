@@ -1,9 +1,6 @@
 import pika
 import os
-from dotenv import load_dotenv
 
-# Load environment variables from the .env file
-load_dotenv()
 
 # Get the value of CLOUDAMQP_URL from the .env file
 CLOUDAMQP_URL = os.getenv("CLOUDAMQP_URL")

@@ -1,5 +1,9 @@
 import pika
 import threading
+from dotenv import load_dotenv
+
+# Load environment variables from the .env file
+load_dotenv()
 
 from src.workers.worker1 import worker1_cb
 
