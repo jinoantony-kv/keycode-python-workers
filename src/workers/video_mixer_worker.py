@@ -70,7 +70,16 @@ def combine_videos_and_audios(video_list, audio_list):
 
             # Combine video and audio
             combined_video = video_clip.set_audio(audio_clip)
-            combined_clips.append(combined_video)
+
+            temp_combined_video = tempfile.NamedTemporaryFile(
+                suffix=".mp4", delete=False
+            )
+            combined_video.write_videofile(
+                temp_combined_video.name, codec="libx264", audio_codec="aac"
+            )
+            combined_video_clip = VideoFileClip(temp_combined_video.name)
+            combined_clips.append(combined_video_clip)
+            temp_files.append(temp_combined_video)
 
         # Concatenate all the combined videos
         final_video = concatenate_videoclips(combined_clips)
