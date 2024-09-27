@@ -26,7 +26,7 @@ class InputProcessor():
         components = {
             "moral_input": None,
             "character_description": None,
-            "story_plot": None,
+            "story_plot": None, 
         }   
 
         try: 

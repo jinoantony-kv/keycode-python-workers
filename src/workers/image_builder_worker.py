@@ -2,11 +2,12 @@ import json
 
 from uuid import uuid4
 
-from src.services.animation import animate_images
+from src.services.animation import animate_images # type: ignore
 from src.workers.video_mixer_worker import upload_to_s3
 from src.utils.db import perform_query
 from src.script_generation.v0.agents.script_generation_agent import ScriptGeneration
-from src.script_generation.prompt import NEW_PROMPT, DEFAULT_PROMPT_INPUT_NEW 
+from src.script_generation.v0.agents.input_processor_agent import InputProcessor
+from src.script_generation.prompt import NEW_PROMPT, DEFAULT_PROMPT_INPUT_NEW,INPUT_PROCESSOR_PROMPT 
 from src.utils.amqp import publish_message
 
 from dotenv import load_dotenv
@@ -21,9 +22,18 @@ def image_builder_worker(ch, method, properties, body):
     user_prompt = data["user_prompt"]
     story_id = data["story_id"]
 
+    input_processor = InputProcessor(system_prompt=INPUT_PROCESSOR_PROMPT)
+
+    input_components = input_processor.process_input(user_prompt)
+    attempt=1
+    while need_input_reprocessing(input_components) and attempt<3:
+        print(f"Reprocessing user input attempt: {attempt}")
+        input_components = input_processor.process_input(user_input=user_prompt)
+        attempt+=1
+
     script_generator = ScriptGeneration(system_prompt=NEW_PROMPT, story_hints=DEFAULT_PROMPT_INPUT_NEW)
     
-    story_script = script_generator.generate_script(user_prompt)
+    story_script = script_generator.generate_script(character=input_components["character_description"],moral=input_components["moral_input"],story_plot=input_components["story_plot"])
     
     
     print(f"Story script generated: {story_script}")
@@ -114,6 +124,12 @@ def need_script_regeneration(scenes):
                 print("No scripts generated")
                 return True
     return False
+
+def need_input_reprocessing(input_components):
+    for key, value in input_components.items():
+        if value is None:
+            print(f"print {key} not generated")
+            return True
 
 if __name__ == "__main__":
     print("Image builder worker started")

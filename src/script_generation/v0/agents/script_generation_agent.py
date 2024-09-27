@@ -3,12 +3,12 @@ from langchain.chains import LLMChain
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 
-from src.script_generation.prompt import DEFAULT_PROMPT_NEW, DEFAULT_PROMPT_INPUT_NEW
+from src.script_generation.prompt import DEFAULT_PROMPT_INPUT_NEW, NEW_PROMPT
 from src.config import OPENAI_API_KEY
 
 
 class ScriptGeneration():
-    def __init__(self,system_prompt  = DEFAULT_PROMPT_NEW,story_hints : dict = DEFAULT_PROMPT_INPUT_NEW):
+    def __init__(self,system_prompt  = NEW_PROMPT ,story_hints : dict = DEFAULT_PROMPT_INPUT_NEW):
         # self.llm = ChatGoogleGenerativeAI(
         #     model="gemini-1.5-flash",
         #     convert_system_message_to_human=False,
@@ -34,7 +34,7 @@ class ScriptGeneration():
         this function can be used to set up the prompt template , whenever a story hint is changed, call this function
         """
         prompt_template = PromptTemplate(
-            input_variables=["user_input"] + list(self.story_hints.keys()),  # Combine user_input and admin settings
+            input_variables=["moral_value","main_character","story_plot"] + list(self.story_hints.keys()),  # Combine user_input and admin settings
             template= self.system_prompt
         )
 
@@ -48,16 +48,15 @@ class ScriptGeneration():
         self.setup_prompt_template()     
 
 
-    def generate_script(self,moral,character):
+    def generate_script(self,moral,character,story_plot):
         """
         Used to generate the script
         """
-        input_data = {"moral_value":moral,"main_character":character,"number":1}
+        input_data = {"moral_value":moral,"main_character":character,"story_plot":story_plot,"number":1}
         input_data.update(self.story_hints)  
         
         try:
             response = self.chain.run(input_data)
-            print(response)
             return self.format_script(response)
         except Exception as e:
             print(f"Error occurred: {e}")
@@ -92,8 +91,6 @@ class ScriptGeneration():
             # Extract Narration
             # print(block)
             narration_match = re.search(r'\s*\*\*Narration:\*\*\s*\n\s*_\"(.*?)\"_', block, re.DOTALL)
-            print(narration_match)
-            print("==========")
             narration = narration_match.group(1).strip() if narration_match else None
             # print(narration)
             # Extract Scene Description

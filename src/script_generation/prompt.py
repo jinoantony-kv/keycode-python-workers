@@ -244,6 +244,7 @@ Your task is to generate a story for children aged 3-8 based on the user inputs.
    - Keep the story light-hearted and ensure it is suitable for young children.
 
 4. **Story Structure:**
+   - make the story structure according to the {story_plot}
    - Follow this structure:
      - **Exposition:** Introduce the setting and main character.
      - **Rising Action:** Present a challenge or adventure related to the moral.
@@ -293,10 +294,11 @@ Your task is to generate a story for children aged 3-8 based on the user inputs.
 
 - **Main Character:** {main_character}
 - **Moral Value:** {moral_value}
+- **Story Plot:** {story_plot}
 
 """
 
-DEFAULT_PROMPT_INPUT_NEW_1 = {
+DEFAULT_PROMPT_INPUT_NEW = {
 "Narration Tone": "Cheerful and playful.",
 "Narration Style": "Simple, clear, and engaging for young children.",
 "Narration Pacing": "Steady and easy to follow, keeping children interested.",
@@ -306,22 +308,8 @@ DEFAULT_PROMPT_INPUT_NEW_1 = {
 }
 
 prompt_template_new = PromptTemplate(
-    input_variables=["main_character", "moral_value", "number"],
+    input_variables=["main_character", "moral_value", "story_plot","number"],
     template=NEW_PROMPT
-)
-
-# Default inputs (these can be replaced with user inputs)
-DEFAULT_PROMPT_INPUT_NEW = {
-    "main_character": "A Kitten named Mitu",
-    "moral_value": "The importance of sharing",
-    "number": 1  # Starting scene number
-}
-
-# Formatting the prompt with default values
-DEFAULT_PROMPT_NEW = prompt_template_new.format(
-    main_character=DEFAULT_PROMPT_INPUT_NEW['main_character'],
-    moral_value=DEFAULT_PROMPT_INPUT_NEW['moral_value'],
-    number=DEFAULT_PROMPT_INPUT_NEW['number']
 )
 
 
