@@ -3,4 +3,5 @@ pika
 python-dotenv
 psycopg2
 requests
+elevenlabs
 boto3
