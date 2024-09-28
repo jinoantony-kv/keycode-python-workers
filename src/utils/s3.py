@@ -1,5 +1,7 @@
 import boto3
 import requests
+from io import BytesIO
+import base64
 
 # Initialize boto3 S3 client
 s3 = boto3.client("s3")
@@ -41,3 +43,23 @@ def upload_to_s3(file_path, bucket_name, s3_key):
     s3.upload_file(
         file_path, bucket_name, s3_key, ExtraArgs={"ACL": "public-read"}
     )
+
+
+def upload_image_object_to_s3(image_data, bucket_name, object_name, content_type='image/png'):
+
+    try:
+        # Decode the base64 image data
+        image_bytes = base64.b64decode(image_data)
+        image_stream = BytesIO(image_bytes)
+
+        # Upload to S3
+        s3.upload_fileobj(
+            image_stream,
+            bucket_name,
+            object_name,
+            ExtraArgs={"ContentType": content_type, "ACL": "public-read"}  # Specify the content type
+        )
+
+        print(f"Image successfully uploaded to {bucket_name}/{object_name}")
+    except Exception as e:
+        print(f"Failed to upload image: {e}")

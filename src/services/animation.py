@@ -50,7 +50,7 @@ def get_bearer_token():
 def animate_images(data):
     ANIMATION_API_URL = "https://api.immersity.ai/api/v1/animation"
     DISPARITY_MAP_API_URL = "https://api.immersity.ai/api/v1/disparity"
-    print('----------------------------------------------------- here -------------------------------')
+    print('----------------------------------------------------- animate_images -------------------------------')
     print(data)
     story_id = data.get("story_id")
     image_url_list = data.get("image_urls", [])
@@ -91,6 +91,7 @@ def animate_images(data):
             animation_result = animation_response.json()
 
             # Collect the animation URL
+            print(f"$$$$------------animation_url: https://100units-multi-media-assets.s3.ap-south-1.amazonaws.com/{s3_key}")
             animation_urls.append(f"https://100units-multi-media-assets.s3.ap-south-1.amazonaws.com/{s3_key}")
 
     except requests.exceptions.RequestException as e:
