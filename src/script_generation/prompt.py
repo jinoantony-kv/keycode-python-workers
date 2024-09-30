@@ -222,27 +222,20 @@ from langchain.prompts import PromptTemplate
 
 NEW_PROMPT = """
 You are an expert STORYTELLER and SCREENPLAY WRITER.
-
 Your task is to generate a story for children aged 3-8 based on the user inputs. Convert it into a screenplay and split each scene into two parts: narration and scene description.
-
 - The **narration** will be used by a voice generation agent to produce audio.
 - The **scene description** will be used by an image generation agent to create visuals as .
-
 ### **Important Guidelines:**
-
 1. **Main Character Emphasis:**
    - Ensure that the main character, "{main_character}", is the protagonist and remains central throughout the story.
    - Do not introduce other characters that overshadow the main character, there should be no more than 2 characters.
-
 2. **Moral Value Integration:**
    - The story must strongly emphasize the moral value: "{moral_value}".
    - The plot should revolve around this moral, making it clear and impactful for young children.
-
 3. **Story Style and Content:**
    - Use simple, age-appropriate language suitable for children aged 3-8.
    - Create an engaging plot with relatable scenarios for kids.
    - Keep the story light-hearted and ensure it is suitable for young children.
-
 4. **Story Structure:**
    - make the story structure according to the {story_plot}
    - Follow this structure:
@@ -251,12 +244,10 @@ Your task is to generate a story for children aged 3-8 based on the user inputs.
      - **Climax:** Highlight the peak of the challenge where the moral lesson is emphasized.
      - **Falling Action:** Show the resolution of the challenge.
      - **Resolution:** Conclude with a positive ending reinforcing the moral.
-
 5. **Narration Instructions:**
    - **Tone:** Cheerful and playful.
    - **Style:** Simple, clear, and engaging for young children.
    - **Pacing:** Steady and easy to follow, keeping children interested.
-
 6. **Scene Description Instructions:**
    - **Style:** Bright, colorful, and whimsical.
    - **Brevity and Clarity:** Keep the description concise and to the point, with a maximum of 50 words per scene. Focus on key details that are essential to set the mood and visualize the environment clearly.
@@ -265,38 +256,36 @@ Your task is to generate a story for children aged 3-8 based on the user inputs.
    - **Setting:** Generate the setting that enhances the mood, but keep the description simple and focused (e.g., cozy home, bright playground).
    - **Mood and Tone:** Evoke a positive and lively atmosphere with minimal but impactful descriptions.
    - **Description Style:** Give characteristics of the characters along with it in brackets (e.g., character(character description))
-
 7. **Scenes:**
    - The story should have a minimum of 6 scenes and a maximum of 10 scenes.
-
 ### **Output Format:**
-
+#STORY NAME:_"suitable name for the story"_
 **Story Plot Structure:**
 - **Exposition**
 - **Rising Action**
 - **Climax**
 - **Falling Action**
 - **Resolution**
-
 **For each scene, provide:**
-
 #### Scene {number}:
-
 1.**Narration:**
    _"Narration text here."_
-
 2.**Scene Description:**
-   _"Scene description here(only one sentence and max 10 words)."_
-
-- Include only essential visual elements like character outfits, colors, emotions, and environmental interactions (e.g., clear blue sky, blooming flowers). Describe facial expressions, body language, and how the characters interact with their surroundings in a concise manner._   
-
+   _"Scene description here(only one sentence  and max 10 words)in format(character,character description,1 action,background)."_
+- Include only essential visual elements like character outfits, colors, emotions, and environmental interactions (e.g., clear blue sky, blooming flowers). Describe facial expressions, body language, and how the characters interact with their surroundings in a concise manner._
 ### **Example Inputs:**
-
 - **Main Character:** {main_character}
 - **Moral Value:** {moral_value}
 - **Story Plot:** {story_plot}
-
 """
+
+
+
+
+
+
+
+
 
 DEFAULT_PROMPT_INPUT_NEW = {
 "Narration Tone": "Cheerful and playful.",
@@ -315,34 +304,26 @@ prompt_template_new = PromptTemplate(
 
 
 INPUT_PROCESSOR_PROMPT = """
-You are an AI assistant responsible for helping create stories for children. Your task is to extract three key components from the input provided by the user: 
-
-1. **Moral Value**: The moral or lesson the story aims to convey.
-2. **Character Description**: A brief description of the main characters, including their names, appearance, and any defining traits.
+You are an AI assistant responsible for helping create stories for children. Your task is to extract three key components from the input provided by the user:
+1. **Moral Value**: The moral or lesson the story aims to convey. (the moral user mentions)
+2. **Character Description**: A brief description of the main characters, including their names, appearance, and any defining traits. (make one according to the user_input)
 3. **Story Plot**: The plot or sequence of events that will take place in the story.
-
 The user might provide full, partial, or no input for any of these components. If the input is unclear or incomplete, infer and fill in the gaps using creative storytelling techniques.
-
 ### Instructions:
 1. If the user provides a moral value, extract it as is. If no moral value is provided, suggest one based on the story context.
 2. Extract any character descriptions the user provides. If they are missing, create them based on the input or generate new characters.
-3. For the story plot, interpret any plot points the user gives. If no plot is provided, construct a simple plot based on the characters and moral value.
-
+3. For the story plot, interpret any plot points the user gives.
+###User Input:
+- user_input : {user_input}
 ### Output Format:
 Provide the processed input in the following structure:
 - **moral_input**: Extracted or inferred moral value.
 - **character_description**: Description of the main characters.
 - **story_plot**: Brief overview of the plot.
-
-If inappropriate or profane content is detected in the input, set a flag in your response to indicate this.
-
 ### Example:
 **User Input**: "I want a story about kindness, with a brave girl and her dog."
-
 **Output**:
 - **moral_input**: "Kindness"
 - **character_description**: "A brave girl with brown hair, wearing a green dress, and her playful dog."
 - **story_plot**: "The girl and her dog help a lost bird find its way home, teaching others the value of kindness."
-
-
 """

@@ -47,4 +47,4 @@ class InputProcessor():
         except Exception as e:
             print(f"Error parsing response: {e}")
         
-        return components , profanity_flag
+        return components

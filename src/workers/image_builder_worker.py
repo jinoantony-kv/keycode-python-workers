@@ -3,12 +3,12 @@ import requests
 
 from uuid import uuid4
 
-from src.services.animation import animate_images # type: ignore
+from src.services.animation import animate_images  # type: ignore
 from src.workers.video_mixer_worker import upload_to_s3
 from src.utils.db import perform_query
 from src.script_generation.v0.agents.script_generation_agent import ScriptGeneration
 from src.script_generation.v0.agents.input_processor_agent import InputProcessor
-from src.script_generation.prompt import NEW_PROMPT, DEFAULT_PROMPT_INPUT_NEW,INPUT_PROCESSOR_PROMPT 
+from src.script_generation.prompt import NEW_PROMPT, DEFAULT_PROMPT_INPUT_NEW, INPUT_PROCESSOR_PROMPT
 from src.utils.amqp import publish_message
 from src.utils.s3 import upload_image_object_to_s3
 from dotenv import load_dotenv
@@ -25,27 +25,32 @@ def image_builder_worker(ch, method, properties, body):
     )
     data = json.loads(body)
     print(f"image_builder_worker: Handling: {data}")
+
     user_prompt = data["user_prompt"]
     story_id = data["story_id"]
 
     input_processor = InputProcessor(system_prompt=INPUT_PROCESSOR_PROMPT)
 
     input_components = input_processor.process_input(user_prompt)
-    attempt=1
-    while need_input_reprocessing(input_components) and attempt<3:
+    attempt = 1
+    print(f"Input components: {input_components}")
+    while need_input_reprocessing(input_components) and attempt < 3:
         print(f"Reprocessing user input attempt: {attempt}")
         input_components = input_processor.process_input(user_input=user_prompt)
-        attempt+=1
-    
+        attempt += 1
+
     if attempt >= 3:
         print("Failed to process input")
         return
 
     script_generator = ScriptGeneration(system_prompt=NEW_PROMPT, story_hints=DEFAULT_PROMPT_INPUT_NEW)
-    
-    story_script = script_generator.generate_script(character=input_components["character_description"],moral=input_components["moral_input"],story_plot=input_components["story_plot"])
-    
-    
+
+    story_script = script_generator.generate_script(
+        character=input_components["character_description"],
+        moral=input_components["moral_input"],
+        story_plot=input_components["story_plot"],
+    )
+
     print(f"Story script generated: {story_script}")
 
     scenes = story_script.get("Scenes")
@@ -62,10 +67,13 @@ def image_builder_worker(ch, method, properties, body):
 
     narrations = [scene.get("Narration") for scene in scenes.values()]
     scene_descriptions = [scene.get("Scene Description") for scene in scenes.values()]
+    narrations = narrations[:2]
+    scene_descriptions = scene_descriptions[:2]
 
     print(f"Narrations: {narrations}")
     print(f"Scene Descriptions: {scene_descriptions}")
     
+
     image_urls = []
     reference_image = None
     for scene_description in scene_descriptions:
@@ -73,20 +81,19 @@ def image_builder_worker(ch, method, properties, body):
         reference_image = generated_image
         image_url = upload_image_data_to_s3(story_id, generated_image)
         image_urls.append(image_url)
-        
+
     print(f"---------Image URLs---------: {image_urls}")
     perform_query(
         "UPDATE stories SET image_assets = %s WHERE id = %s",
         (json.dumps(image_urls), story_id),
     )
-        
 
     publish_message("audio-queue", json.dumps({"story_id": story_id, "narrations": narrations}))
 
     # image_urls = []
 
     # TODO - Remove this hardcoded list of images
-    
+
     # images = ["image_1.png", "image_2.png"]
 
     # # for scene_description in scene_descriptions:
@@ -111,7 +118,9 @@ def image_builder_worker(ch, method, properties, body):
         (json.dumps(video_urls), story_id),
     )
     publish_message(VIDEO_MIXER_QUEUE, json.dumps({"story_id": story_id}))
-    print("------------------------------ Completed image builder worker -----------------------------------------------")
+    print(
+        "------------------------------ Completed image builder worker -----------------------------------------------"
+    )
 
 
 def upload_image_to_s3(story_id, output_path):
@@ -121,6 +130,7 @@ def upload_image_to_s3(story_id, output_path):
 
     image_url = f"https://100units-multi-media-assets.s3.ap-south-1.amazonaws.com/{s3_key}"
     return image_url
+
 
 def upload_image_data_to_s3(story_id, image_data):
     bucket_name = "100units-multi-media-assets"
@@ -149,11 +159,14 @@ def need_script_regeneration(scenes):
                 return True
     return False
 
+
 def need_input_reprocessing(input_components):
-    for key, value in input_components.items():
+    return False
+    for key, value in input_components:
         if value is None:
             print(f"print {key} not generated")
             return True
+
 
 def generate_image(prompt, image=None):
     # Define the URL and the payload to send.
@@ -164,6 +177,7 @@ def generate_image(prompt, image=None):
             "sd_model_checkpoint": "RealitiesEdgeXLANIME_20.safetensors",
         }
         _ = requests.post(url=f"{url}/sdapi/v1/options", json=option_payload)
+
     set_model()
 
     prompt = prompt + "<lora:Cartoon_SDXL_V2-fixed:1>"
@@ -208,6 +222,14 @@ def generate_image(prompt, image=None):
     r = response.json()
     return r["images"][0]
 
-# if __name__ == "__main__":
-#     print("Image builder worker started")
-#     image_builder_worker(None, None, None, json.dumps({"user_prompt": "This is a test prompt", "story_id": 1}))
+
+if __name__ == "__main__":
+    print("Image builder worker started")
+    image_builder_worker(
+        None,
+        None,
+        None,
+        json.dumps(
+            {"user_prompt": "Create a story with fox and and elephant with moral of discipline", "story_id": 41}
+        ),
+    )

@@ -7,6 +7,7 @@ load_dotenv(override=True)
 
 from src.workers.video_mixer_worker import video_mixer_worker_cb
 from src.workers.audio_builder_worker import text_to_audio_worker
+from src.workers.image_builder_worker import image_builder_worker
 
 # RabbitMQ connection settings for CloudAMQP
 CLOUDAMQP_URL = "amqps://buaalina:6OTVB39Ou0xkMadPjkPNjsukl94w06Tg@armadillo.rmq.cloudamqp.com/buaalina"
@@ -68,6 +69,7 @@ if __name__ == "__main__":
     # Register workers for different queues with their respective callbacks
     worker_register.register("test_queue_0", video_mixer_worker_cb)
     worker_register.register("audio-queue", text_to_audio_worker)
+    worker_register.register("image_queue", image_builder_worker)
 
     # Wait for all threads (workers) to complete
     worker_register.wait_for_completion()

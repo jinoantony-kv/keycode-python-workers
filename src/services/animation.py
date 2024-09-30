@@ -12,9 +12,20 @@ load_dotenv(override=True)
 token = None
 token_expiration = 0
 
-def get_bearer_token():
-        client_id = os.getenv("IMMERSITY_AI_CLIENT_ID")
-        client_secret = os.getenv("IMMERSITY_AI_CLIENT_SECRET")
+def get_bearer_token(index):
+        secrets = [
+            ("5f5af385-9af3-4d5e-9e24-ee01f19ad2e4", "rT8UMAKKAhxpsgci7hZdEruIeE8OawDP"),
+            ("5dbf7b8f-8459-4fe4-9628-bebc9641604b", "QlsKjHDVt19zlmXtklHzz3x81yHNDBzK"),
+            # ("dd1a437e-18ee-4432-80e1-436272c5c53b", "lwfYgwD1Y98ZnqcEB7E3VdV2NnqTzF0a"),
+            # ("0c663d1b-3698-4b0b-b81a-77166e88d693", "ruv5eznen4olEnPorWIpxMLqBn3fIEAi"),
+            # ("c7cc23ad-9701-4c79-86eb-e73f3624f477", "unuuiuP0gupJiCiQmTXp6Uw9veQnwcFr"),
+            # ("2e9bfccf-e7f8-4352-80b3-8405e9784421", "mY8tDQcILkDQI6Xs0q7csf8JkXhdEoJa"),
+        ]
+        
+        secret = secrets[index % len(secrets)]
+        # client_id = os.getenv("IMMERSITY_AI_CLIENT_ID")
+        # client_secret = os.getenv("IMMERSITY_AI_CLIENT_SECRET")
+        client_id, client_secret = secret
         # client_id = '5f5dd569-4bcf-4b80-8f89-9261d8ed0dc1'
         # client_secret = 'EyQnr8PiHOys4UZ5DlODNPPlRW0M5JSu'
         print('Immercity creds')
@@ -56,11 +67,11 @@ def animate_images(data):
     image_url_list = data.get("image_urls", [])
     animation_urls = []
     try:
-        for image_url in image_url_list:
+        for idx, image_url in enumerate(image_url_list):
             headers = {
                 "accept": "application/json",
                 "content-type": "application/json",
-                "authorization": f"Bearer {get_bearer_token()}"
+                "authorization": f"Bearer {get_bearer_token(idx)}"
             }
 
             # Prepare the disparity payload
